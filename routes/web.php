@@ -43,3 +43,4 @@ $router->group(['prefix' => 'driver', 'middleware' => 'client'], function () use
 $router->get('/key', function() {
     return str_random(32);
 });
+
