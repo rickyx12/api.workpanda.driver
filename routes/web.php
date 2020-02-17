@@ -15,30 +15,41 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-$router->post('driver/register','Driver@register');
+$router->post('/register', 'Auth@register');
+$router->post('/login', 'Auth@login');
 
-$router->group(['prefix' => 'driver', 'middleware' => 'client'], function () use ($router) {
-	$router->get('','Driver@index');
-	$router->get('{id}','Driver@information');
-	$router->put('{id}/update','Driver@update');
-	$router->delete('{id}/delete','Driver@delete');
-	$router->put('{id}/activate','Driver@activate');
-	$router->put('{id}/deactivate','Driver@deactivate');
+$router->group(['prefix' => 'profile/', 'middleware' => 'client'], function() use ($router) {
 
-	$router->group(['prefix' => '{driver}/signboard'], function () use ($router) {
-		$router->get('','Signboard@index');
-		$router->post('add','Signboard@add');
-		$router->put('update/{id}','Signboard@update');
-		$router->delete('delete/{id}','Signboard@delete');
+	$router->post('register', 'Profile@register');
 
-		$router->group(['prefix' => '{signboard}/route'], function () use ($router) {
-			$router->get('','Route@index');
-			$router->post('add','Route@add');
-			$router->put('update/{id}','Route@update');
-			$router->delete('delete/{id}','Route@delete');
+	$router->get('{profile_id}', 'Profile@index');
+	$router->get('{profile_id}/orders', 'Profile@orders');
+	$router->put('{profile_id}/update', 'Profile@update');
+
+	$router->group(['prefix' => '{profile_id}/'], function() use ($router) {
+
+		$router->get('store', 'Store@index');
+		$router->post('store/add', 'Store@add');
+		$router->put('store/{store_id}/update', 'Store@update');
+		$router->delete('store/{store_id}/delete', 'Store@delete');
+
+		$router->group(['prefix' => 'store/'], function() use ($router) {
+
+			$router->get('{store_id}/menu/', 'Menu@index');
+			$router->post('{store_id}/menu/add', 'Menu@add');
+			$router->put('{store_id}/menu/{menu_id}/update', 'Menu@update');
+			$router->delete('{store_id}/menu/{menu_id}/delete', 'Menu@delete');		
 		});
 	});
 });
+
+
+$router->group(['prefix' => 'store/'], function() use ($router) {
+
+	$router->post('{store_id}/menu/{menu_id}/order', 'Menu@order');
+	$router->get('{store_id}/orders', 'Store@orders');
+});
+	
 
 $router->get('/key', function() {
     return str_random(32);
